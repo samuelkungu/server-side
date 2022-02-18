@@ -4,7 +4,7 @@ const config = require('../config/db')
 async function getUsers (req,res){
     try{
         await mssql.connect(config)
-        const result = await (await mssql.query("SELECT * FROM users")).recordset
+        const result = await (await mssql.query("EXECUTE spUsers;")).recordset
         res.json(result)
     } catch (err){
         console.log(err);
@@ -15,8 +15,9 @@ async function getUser (req,res){
     try{
         let pool = await mssql.connect(config)
         let result1 = await pool.request()
-        .query(`select * from users where id = ${id}`)
+        .query(`EXECUTE spUser ${id}`)
         res.json(result1.recordset)
+        res.json(" successful")
 
     } catch (err){
         console.log(err);
@@ -27,8 +28,7 @@ async function addUser (req,res){
     try{
         let pool = await mssql.connect(config)
         await pool.request()
-        .query(`INSERT INTO users(firstname, secondname, email, project, password)
-            VALUES('${firstname}','${secondname}','${email}','${project}','${password}')`)
+        .query(`EXECUTE spAdd;`)
         res.json("user added successfully")
 
     } catch (err){
@@ -43,11 +43,11 @@ async function updateUser (req,res){
         await pool.request()
         .input('id', mssql.Int, id)
         .input('firstname', mssql.VarChar, firstname)
-        .input('secondname', mssql.VarChar, secondname)
+        .input('lastname', mssql.VarChar, secondname)
         .input('email', mssql.VarChar, email)
         .input('project', mssql.Text, project)
         .input('password', mssql.VarChar, password)
-        .query('UPDATE users SET firstname = @firstname, secondname = @secondname, email = @email, project = @project, password = @password WHERE id = @id')
+        .query('UPDATE users SET firstname = @firstname, lastname = @lastname, email = @email, project = @project, password = @password WHERE id = @id')
 
         res.json("user added successfully")
 
@@ -60,7 +60,7 @@ async function deleteUser (req,res){
     try{
         let pool = await mssql.connect(config)
         let result1 = await pool.request()
-        .query(`DELETE from users where id = ${id}`)
+        .query(`EXECUTE spDel ${id}`)
         res.json("User deleted successfully")
 
     } catch (err){
