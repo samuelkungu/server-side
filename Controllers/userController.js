@@ -48,6 +48,7 @@ async function updateUser (req,res){
         .input('project', mssql.Text, project)
         .input('password', mssql.VarChar, password)
         .query('UPDATE users SET firstname = @firstname, lastname = @lastname, email = @email, project = @project, password = @password WHERE id = @id')
+        .query('EXECUTE spUpdate')
 
         res.json("user added successfully")
 
