@@ -30,7 +30,7 @@ async function addUser (req,res){
         await pool.request()
         .input('id', mssql.Int, id)
         .input('firstname', mssql.VarChar, firstname)
-        .input('lastname', mssql.VarChar, secondname)
+        .input('lastname', mssql.VarChar, lastname)
         .input('email', mssql.VarChar, email)
         .input('project', mssql.Text, project)
         .input('passwd', mssql.VarChar, passwd)
@@ -42,18 +42,17 @@ async function addUser (req,res){
     }
 }
 async function updateUser (req,res){
-    const{firstname, secondname, email, project, password} = req.body
+    const{firstname, lastname, email, project, passwd} = req.body
     const id = req.params.id
     try{
         let pool = await mssql.connect(config)
         await pool.request()
         .input('id', mssql.Int, id)
         .input('firstname', mssql.VarChar, firstname)
-        .input('lastname', mssql.VarChar, secondname)
+        .input('lastname', mssql.VarChar, lastname)
         .input('email', mssql.VarChar, email)
         .input('project', mssql.Text, project)
-        .input('password', mssql.VarChar, password)
-        .query('UPDATE users SET firstname = @firstname, lastname = @lastname, email = @email, project = @project, password = @password WHERE id = @id')
+        .input('passwd', mssql.VarChar, passwd)
         .query(`spPut ${id} ,${firstname} , ${lastname}, ${email}, ${project} ,${passwd};`)
 
         res.json("user added successfully")
