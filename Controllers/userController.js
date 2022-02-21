@@ -4,7 +4,7 @@ const config = require('../config/db')
 async function getUsers (req,res){
     try{
         await mssql.connect(config)
-        const result = await (await mssql.query("EXECUTE spUsers;")).recordset
+        const result = await (await mssql.execute('spUsers')).recordset
         res.json(result)
     } catch (err){
         console.log(err);
@@ -15,7 +15,7 @@ async function getUser (req,res){
     try{
         let pool = await mssql.connect(config)
         let result1 = await pool.request()
-        .query(`EXECUTE spUser ${id}`)
+        .input('id',mssql.Int,id).execute('spUser')
         res.json(result1.recordset)
         res.json(" successful")
 
@@ -24,11 +24,17 @@ async function getUser (req,res){
     }
 }
 async function addUser (req,res){
-    const{firstname, secondname, email, project, password} = req.body
+    const{firstname, lastname, email, project, passwd} = req.body
     try{
         let pool = await mssql.connect(config)
         await pool.request()
-        .query(`EXECUTE spAdd;`)
+        .input('id', mssql.Int, id)
+        .input('firstname', mssql.VarChar, firstname)
+        .input('lastname', mssql.VarChar, secondname)
+        .input('email', mssql.VarChar, email)
+        .input('project', mssql.Text, project)
+        .input('passwd', mssql.VarChar, passwd)
+        .execute(`spPost`)
         res.json("user added successfully")
 
     } catch (err){
@@ -48,7 +54,7 @@ async function updateUser (req,res){
         .input('project', mssql.Text, project)
         .input('password', mssql.VarChar, password)
         .query('UPDATE users SET firstname = @firstname, lastname = @lastname, email = @email, project = @project, password = @password WHERE id = @id')
-        .query('EXECUTE spUpdate')
+        .query(`spPut ${id} ,${firstname} , ${lastname}, ${email}, ${project} ,${passwd};`)
 
         res.json("user added successfully")
 
@@ -61,7 +67,7 @@ async function deleteUser (req,res){
     try{
         let pool = await mssql.connect(config)
         let result1 = await pool.request()
-        .query(`EXECUTE spDel ${id}`)
+        .input('id',mssql.Int,id).execute('spDel')
         res.json("User deleted successfully")
 
     } catch (err){
