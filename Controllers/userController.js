@@ -3,9 +3,10 @@ const config = require('../config/db')
 
 async function getUsers (req,res){
     try{
-         await mssql.connect(config)
+        await mssql.connect(config)
         const result = await (await mssql.query('exec spUsers')).recordset
         res.json(result)
+    
     } catch (err){
         console.log(err);
     }
