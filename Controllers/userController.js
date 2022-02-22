@@ -3,8 +3,8 @@ const config = require('../config/db')
 
 async function getUsers (req,res){
     try{
-        await mssql.connect(config)
-        const result = await (await mssql.execute('spUsers')).recordset
+         await mssql.connect(config)
+        const result = await (await mssql.query('exec spUsers')).recordset
         res.json(result)
     } catch (err){
         console.log(err);
@@ -15,7 +15,8 @@ async function getUser (req,res){
     try{
         let pool = await mssql.connect(config)
         let result1 = await pool.request()
-        .input('id',mssql.Int,id).execute('spUser')
+        .input('id',mssql.Int,id)
+        .execute('spUser')
         res.json(result1.recordset)
         res.json(" successful")
 
@@ -24,7 +25,7 @@ async function getUser (req,res){
     }
 }
 async function addUser (req,res){
-    const{firstname, lastname, email, project, passwd} = req.body
+    const{id, firstname, lastname, email, project, passwd} = req.body
     try{
         let pool = await mssql.connect(config)
         await pool.request()
@@ -35,7 +36,7 @@ async function addUser (req,res){
         .input('project', mssql.Text, project)
         .input('passwd', mssql.VarChar, passwd)
         .execute(`spPost`)
-        res.json("user added successfully")
+        res.json("User added successfully")
 
     } catch (err){
         console.log(err);
@@ -53,9 +54,9 @@ async function updateUser (req,res){
         .input('email', mssql.VarChar, email)
         .input('project', mssql.Text, project)
         .input('passwd', mssql.VarChar, passwd)
-        .query(`spPut ${id} ,${firstname} , ${lastname}, ${email}, ${project} ,${passwd};`)
+        .execute('spPut')
 
-        res.json("user added successfully")
+        res.json("User updated successfully")
 
     } catch (err){
         console.log(err);
@@ -66,7 +67,8 @@ async function deleteUser (req,res){
     try{
         let pool = await mssql.connect(config)
         let result1 = await pool.request()
-        .input('id',mssql.Int,id).execute('spDel')
+        .input('id',mssql.Int,id)
+        .execute('spDel')
         res.json("User deleted successfully")
 
     } catch (err){
